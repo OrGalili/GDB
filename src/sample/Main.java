@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class Main extends Application {
 
     @Override
@@ -18,6 +20,17 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        launch(args);
+        // launch(args);
+        TestGDB b = new TestGDB();
+        b.test(null);
+        /*try {
+            CLIIntegration.exec("pwd");
+            CLIIntegration.exec("gdb");
+            //CLIIntegration.exec("help");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
 }
