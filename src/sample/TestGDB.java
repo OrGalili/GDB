@@ -7,8 +7,6 @@ import java.util.ArrayList;
 public class TestGDB {
     private InputStream inpStr= null;
     private OutputStream outStr = null;
-    private InputStream errStr = null;
-    private boolean errorState = false;
     private boolean inpState = false;
 
     public static void main(String[] args) {
@@ -20,31 +18,21 @@ public class TestGDB {
         ArrayList<String> cmd = new ArrayList<String>();
         cmd.add("gdb");
 
+
         ProcessBuilder pb = new ProcessBuilder(cmd);
+        pb.redirectErrorStream(true);
         try {
             Process p = pb.start();
             outStr = p.getOutputStream();  /* Handle to the stdin of process */
             inpStr = p.getInputStream();  /* Handle to the stdout of process */
-            errStr = p.getErrorStream();
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outStr));
             BufferedReader br = new BufferedReader(new InputStreamReader(inpStr));
-            BufferedReader brErr = new BufferedReader(new InputStreamReader(errStr));
             int ascii;
             char c;
             String userInput="";
 
             while(!userInput.toLowerCase().equals("quit")) {
-                /*while (true) {
-                    ascii = brErr.read();
-                    c = (char) ascii;
-                    System.out.print(c);
-                    errorState = brErr.ready();
-                    if (errorState == false) {
-                        break;
-                    }
-                }*/
-
                 while (true) {
                     ascii = br.read();
                     c = (char) ascii;
