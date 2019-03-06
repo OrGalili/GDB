@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.GridPane?>
 
-<GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.Controller">
+<GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.GDBController">
   <children>
     <GridPane prefHeight="237.0" prefWidth="259.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
       <children>
@@ -35,7 +35,7 @@
             </Tab>
           </tabs>
         </TabPane>
-        <TextArea prefWidth="200.0" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextArea prefWidth="200.0" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="1" fx:id="orgalili"/>
         <MenuBar GridPane.columnIndex="0" GridPane.rowIndex="0">
           <menus>
             <Menu mnemonicParsing="false" text="file">
