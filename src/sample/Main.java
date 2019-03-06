@@ -6,13 +6,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("GDBView.fxml"));
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();
@@ -20,17 +18,13 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        // launch(args);
-        TestGDB b = new TestGDB();
-        b.test(null);
-        /*try {
-            CLIIntegration.exec("pwd");
-            CLIIntegration.exec("gdb");
-            //CLIIntegration.exec("help");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+        //launch(args);
+        //TestGDB b = new TestGDB();
+        //b.test(null);
+
+       // GDBModel m = new GDBModel();
+       // m.GDBStart();
+        TestGDB d = new TestGDB();
+        d.test();
     }
 }

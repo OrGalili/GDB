@@ -9,12 +9,7 @@ public class TestGDB {
     private OutputStream outStr = null;
     private boolean inpState = false;
 
-    public static void main(String[] args) {
-        TestGDB gdb = new TestGDB();
-        gdb.test(null);
-    }
-
-    public void test(String[] args) {
+    public void test() {
         ArrayList<String> cmd = new ArrayList<String>();
         cmd.add("gdb");
 
@@ -31,6 +26,7 @@ public class TestGDB {
             int ascii;
             char c;
             String userInput="";
+            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
             while(!userInput.toLowerCase().equals("quit")) {
                 while (true) {
@@ -43,14 +39,15 @@ public class TestGDB {
                     }
                 }
 
-                BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
                 userInput = bufferRead.readLine();
                 bw.write(userInput + "\n");
                 bw.flush();
             }
+            System.exit(0);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println(e);
         }
     }
 }
+
