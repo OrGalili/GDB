@@ -1,9 +1,6 @@
 package sample;
 
-import javafx.concurrent.Task;
-
 import java.io.*;
-import java.util.ArrayList;
 
 public class GDBModel {
     private ProcessBuilder processBuilder;
@@ -48,7 +45,7 @@ public class GDBModel {
         bufferedWriter = new BufferedWriter(new OutputStreamWriter(inpStr));
         bufferedReader = new BufferedReader(new InputStreamReader(outStr));
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        StdThread readOutPut = new StdThread(bufferedReader,output);
+        StdOutThread readOutPut = new StdOutThread(bufferedReader,output);
 
         readOutPut.start();
         String userInput="";
