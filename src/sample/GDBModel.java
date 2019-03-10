@@ -6,77 +6,66 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class GDBModel {
-    private ProcessBuilder pb;
-    private Process p;
-    private BufferedWriter bw;
-    private BufferedReader br;
-    private InputStream inpStr= null;
-    private OutputStream outStr = null;
+    private ProcessBuilder processBuilder;
+    private Process subProcess;
+    private BufferedWriter bufferedWriter;
+    private BufferedReader bufferedReader;
+    private InputStream outStr= null;
+    private OutputStream inpStr = null;
     private boolean inpState = false;
-    private String output ="";
+    private StringBuilder output;
 
     public Process getProcess() {
-        return p;
+        return subProcess;
     }
 
     public ProcessBuilder getProcessBuilder() {
-        return pb;
+        return processBuilder;
     }
 
-
-
     public GDBModel(){
-        pb = new ProcessBuilder("gdb");
-        pb.redirectErrorStream(true);
+        processBuilder = new ProcessBuilder("gdb");
+        processBuilder.redirectErrorStream(true);
+        output = new StringBuilder();
     }
 
     public void GDBStart(){
         try {
-            if (p == null || !p.isAlive())
+            if (subProcess == null || !subProcess.isAlive())
                 startGDB();
         }
         catch (IOException e){
 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
-    private void startGDB() throws IOException{
-        p = pb.start();
-        outStr = p.getOutputStream();  /* Handle to the stdin of process */
-        inpStr = p.getInputStream();  /* Handle to the stdout of process */
-        bw = new BufferedWriter(new OutputStreamWriter(outStr));
-        br = new BufferedReader(new InputStreamReader(inpStr));
+    private void startGDB() throws IOException, InterruptedException {
+        subProcess = processBuilder.start();
+        inpStr = subProcess.getOutputStream();  /* Handle to the stdin of process */
+        outStr = subProcess.getInputStream();  /* Handle to the stdout of process */
+        bufferedWriter = new BufferedWriter(new OutputStreamWriter(inpStr));
+        bufferedReader = new BufferedReader(new InputStreamReader(outStr));
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        StdThread readOutPut = new StdThread(br,output);
-        readOutPut.start();
+        StdThread readOutPut = new StdThread(bufferedReader,output);
 
-        //int ascii;
-        //char c;
+        readOutPut.start();
         String userInput="";
 
         while(!userInput.toLowerCase().equals("quit")) {
-
-            /*while (true) {
-                ascii = br.read();
-                c = (char) ascii;
-                System.out.print(c);
-                inpState = br.ready();
-                if (inpState == false) {
-                    break;
-                }
-            }*/
-
-
             userInput = bufferRead.readLine();
-            if(userInput.toLowerCase().equals("quit")){
+            if(userInput.toLowerCase().equals("quit"))
                 readOutPut.interrupt();
-                //p.destroy();
-            }
-            bw.write(userInput + "\n");
-            //userInput.clear();
-            bw.flush();
-        }
 
+
+            output.setLength(0);
+
+            bufferedWriter.write(userInput + "\n");
+            bufferedWriter.flush();
+        }
+        subProcess.waitFor();
+        subProcess.destroy();
     }
 
     public void stopGDB(){
