@@ -18,13 +18,8 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        //launch(args);
-        //TestGDB b = new TestGDB();
-        //b.test(null);
-
-       // GDBModel m = new GDBModel();
-       // m.GDBStart();
-        TestGDB d = new TestGDB();
-        d.test();
+        launch(args);
+        GDBModel m = new GDBModel();
+        m.GDBStart();
     }
 }
