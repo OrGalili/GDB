@@ -10,7 +10,7 @@ public class GDBModel {
     private InputStream outStr= null;
     private OutputStream inpStr = null;
     private boolean inpState = false;
-    private StringBuilder output;
+    private StringBuilder GDBOutput;
 
     public Process getProcess() {
         return subProcess;
@@ -23,7 +23,7 @@ public class GDBModel {
     public GDBModel(){
         processBuilder = new ProcessBuilder("gdb");
         processBuilder.redirectErrorStream(true);
-        output = new StringBuilder();
+        GDBOutput = new StringBuilder();
     }
 
     public void GDBStart(){
@@ -31,38 +31,21 @@ public class GDBModel {
             if (subProcess == null || !subProcess.isAlive())
                 startGDB();
         }
-        catch (IOException e){
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        catch (IOException e){ }
     }
 
-    private void startGDB() throws IOException, InterruptedException {
+    private void startGDB() throws IOException {
         subProcess = processBuilder.start();
         inpStr = subProcess.getOutputStream();  /* Handle to the stdin of process */
-        outStr = subProcess.getInputStream();  /* Handle to the stdout of process */
+        outStr = subProcess.getInputStream();   /* Handle to the stdout of process */
         bufferedWriter = new BufferedWriter(new OutputStreamWriter(inpStr));
         bufferedReader = new BufferedReader(new InputStreamReader(outStr));
-        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        StdOutThread readOutPut = new StdOutThread(bufferedReader,output);
 
-        readOutPut.start();
-        String userInput="";
+        StdOutThread th_readGDB = new StdOutThread(bufferedReader,GDBOutput);
+        th_readGDB.start();
 
-        while(!userInput.toLowerCase().equals("quit")) {
-            userInput = bufferRead.readLine();
-            if(userInput.toLowerCase().equals("quit"))
-                readOutPut.interrupt();
-
-
-            output.setLength(0);
-
-            bufferedWriter.write(userInput + "\n");
-            bufferedWriter.flush();
-        }
-        subProcess.waitFor();
-        subProcess.destroy();
+        StdInThread th_writeGDB = new StdInThread(bufferedWriter,th_readGDB,subProcess);
+        th_writeGDB.start();
     }
 
     public void stopGDB(){

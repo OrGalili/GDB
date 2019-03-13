@@ -8,11 +8,11 @@ public class StdOutThread extends Thread {
     private char c;
     private static boolean inpState;
     private BufferedReader bufferedReader;
-    private StringBuilder out;
+    private StringBuilder GDBOutput;
 
-    public StdOutThread(BufferedReader br, StringBuilder out) {
+    public StdOutThread(BufferedReader br, StringBuilder GDBOutput) {
         bufferedReader = br;
-        this.out = out;
+        this.GDBOutput = GDBOutput;
     }
 
     public void run() {
@@ -24,18 +24,19 @@ public class StdOutThread extends Thread {
                         break;
                     c = (char) ascii;
                     System.out.print(c);
-                    out.append(c);
+                    GDBOutput.append(c);
                     inpState = bufferedReader.ready();
                     if (inpState == false)
                         break;
                 }
                 if (isInterrupted())
                     break;
-                //if(out.contains("(gdb)")) {
+                if(GDBOutput.indexOf("(gdb)")!=-1) {
+                    GDBOutput.setLength(0);
                     //Pseudo code
                     //endOut = out
                     //notify end of specific output
-                //}
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
