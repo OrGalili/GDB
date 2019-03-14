@@ -21,5 +21,10 @@ public class Main extends Application {
         launch(args);
         GDBModel m = new GDBModel();
         m.GDBStart();
+
+        GDBModel m = new GDBModel();
+        View v = new View();
+        GDBController c = new GDBController(m, v);
+        c.initController();
     }
 }
