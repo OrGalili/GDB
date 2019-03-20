@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 
-public class StdInThread extends Thread{
+public class StdInThread /*extends Thread*/{
 
     private BufferedWriter bufferedWriter;
     private StdOutThread th_readGDB;
@@ -18,7 +18,7 @@ public class StdInThread extends Thread{
         this.subProcess = subProcess;
     }
 
-    public void run() {
+   /* public void run() {
         String userInput = "";
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -37,7 +37,17 @@ public class StdInThread extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }*/
 
+    public void setInput(String in){
+        try {
+            bufferedWriter.write(in + "\n");
+            bufferedWriter.flush();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
 }

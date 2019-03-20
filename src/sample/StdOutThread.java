@@ -32,6 +32,7 @@ public class StdOutThread extends Thread {
                 if (isInterrupted())
                     break;
                 if(GDBOutput.indexOf("(gdb)")!=-1) {
+                    getOutPut();
                     GDBOutput.setLength(0);
                     //Pseudo code
                     //endOut = out
@@ -41,5 +42,9 @@ public class StdOutThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getOutPut(){
+        return GDBOutput.toString();
     }
 }
