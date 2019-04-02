@@ -10,24 +10,10 @@ public class GDBModel {
     private InputStream outStr= null;
     private OutputStream inpStr = null;
     private boolean inpState = false;
-    //private StringBuilder GDBOutput;
-
-    public StdOutThread th_readGDB;
-    public StdInThread th_writeGDB;
-
-    public Process getProcess() {
-        return subProcess;
-    }
-
-    public ProcessBuilder getProcessBuilder() {
-        return processBuilder;
-    }
 
     public GDBModel(){
         processBuilder = new ProcessBuilder("gdb");
         processBuilder.redirectErrorStream(true);
-
-        //GDBOutput = new StringBuilder();
     }
 
     public void GDBStart(){
@@ -41,16 +27,10 @@ public class GDBModel {
     private void startGDB() throws IOException {
         subProcess = processBuilder.start();
         inpStr = subProcess.getOutputStream();  /* Handle to the stdin of process */
-        outStr = subProcess.getInputStream();   /* Handle to the stdout of process */
+        outStr = subProcess.getInputStream();   /* Handle to the stdout of process*/
         bufferedWriter = new BufferedWriter(new OutputStreamWriter(inpStr));
         bufferedReader = new BufferedReader(new InputStreamReader(outStr));
         getOutPut();
-
-        //th_readGDB = new StdOutThread(bufferedReader,GDBOutput);
-        //th_readGDB.start();
-
-        //th_writeGDB = new StdInThread(bufferedWriter,th_readGDB,subProcess);
-        //th_writeGDB.start();
     }
 
     public void stopGDB(){
@@ -67,38 +47,24 @@ public class GDBModel {
         }
     }
 
-    public String getOutPut(){
+    public String getOutPut() {
         int ascii;
         char c;
         String GDBOutput = "";
         try {
-           // while (true) {
-                while (true) {
-                    ascii = bufferedReader.read();
-                    //if (isInterrupted())
-                    //    break;
-                    c = (char) ascii;
-                    System.out.print(c);
-                    GDBOutput+=c;
-                    inpState = bufferedReader.ready();
-                    if (inpState == false && GDBOutput.indexOf("(gdb)")!=-1)
-                        break;
-                }
-                //if (isInterrupted())
-                  //  break;
-                //if(GDBOutput.indexOf("(gdb)")!=-1) {
-                //    break;
-                    //Pseudo code
-                    //endOut = out
-                    //notify end of specific output
-                //}
-            //}
-        } catch (IOException e) {
+
+            while (true) {
+                ascii = bufferedReader.read();
+                c = (char) ascii;
+                System.out.print(c);
+                GDBOutput += c;
+                inpState = bufferedReader.ready();
+                if (inpState == false && GDBOutput.endsWith("(gdb) "))
+                    break;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return GDBOutput;
     }
-
-
-
 }
