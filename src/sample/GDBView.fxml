@@ -14,6 +14,7 @@
         <RowConstraints vgrow="NEVER" />
       </rowConstraints>
       <children>
+        <ToolBar>
         <MenuBar GridPane.columnIndex="0" GridPane.rowIndex="0">
           <menus>
             <Menu mnemonicParsing="false" text="file">
@@ -23,7 +24,9 @@
             </Menu>
           </menus>
         </MenuBar>
-
+          <Button text="run" onAction="#RunExeFile"></Button>
+          <Button text="step" onAction="#Step"></Button>
+        </ToolBar>
         <ListView fx:id="code" prefWidth="200.0" GridPane.rowIndex="1" GridPane.columnIndex="0"  />
         <TabPane prefHeight="300.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0" GridPane.rowIndex="2">
           <tabs>

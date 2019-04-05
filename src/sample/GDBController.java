@@ -4,7 +4,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -45,6 +44,7 @@ public class GDBController {
 
 
 
+        //code.backgroundProperty().setValue(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
         java.util.List<String> lines = Arrays.asList(codeLines);
         code.setItems(FXCollections.observableList(lines));
         code.setCellFactory(CheckBoxListCell.forListView((Callback<String, ObservableValue<Boolean>>) item -> {
@@ -62,5 +62,26 @@ public class GDBController {
             );
             return observable ;
         }));
+    }
+
+    @FXML
+    protected void RunExeFile(ActionEvent event)
+    {
+        model.setInput("run");
+        code.getSelectionModel().select(getNextLineNumber());
+    }
+
+    @FXML
+    protected void Step(ActionEvent event){
+        model.setInput("step");
+        code.getSelectionModel().select(getNextLineNumber());
+    }
+
+    private int getNextLineNumber(){
+        String[] out = model.getOutPut().split("\n");
+        int index = out.length-2;
+        char c = out[index].toCharArray()[0];
+        int lineNumber = (int)c - 48 - 1;
+        return lineNumber;
     }
 }
