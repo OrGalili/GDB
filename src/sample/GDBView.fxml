@@ -12,6 +12,7 @@
         <RowConstraints vgrow ="NEVER"/>
         <RowConstraints vgrow="ALWAYS" />
         <RowConstraints vgrow="NEVER" />
+        <!--<RowConstraints vgrow="NEVER" />-->
       </rowConstraints>
       <children>
         <ToolBar>
@@ -26,8 +27,10 @@
         </MenuBar>
           <Button text="run" onAction="#RunExeFile"></Button>
           <Button text="step" onAction="#Step"></Button>
+          <Button text="step in" onAction="#StepIn"></Button>
         </ToolBar>
-        <ListView fx:id="code" prefWidth="200.0" GridPane.rowIndex="1" GridPane.columnIndex="0"  />
+        <TabPane  fx:id="sourceFiles" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <!--<ListView fx:id="code" prefWidth="200.0" GridPane.rowIndex="2" GridPane.columnIndex="0"  />-->
         <TabPane prefHeight="300.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0" GridPane.rowIndex="2">
           <tabs>
             <Tab text="Untitled Tab 1">
