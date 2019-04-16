@@ -22,9 +22,6 @@ public class GDBController {
     @FXML
     public TabPane sourceFiles;
 
-    //@FXML
-    //public ListView code ;
-
     @FXML
     public MenuItem openFile;
 
@@ -76,10 +73,10 @@ public class GDBController {
                                 {
                                     //System.out.println("Check box for "+item+" changed from "+wasSelected+" to "+isNowSelected);
                                     if(!wasSelected) {
-                                        model.setInput("break " + item.toCharArray()[0]);
+                                        model.setInput("break " + item.substring(0,item.indexOf('\t')));
                                     }
                                     else
-                                        model.setInput("clear "+item.toCharArray()[0]);
+                                        model.setInput("clear " + item.substring(0,item.indexOf('\t')));
                                     model.getOutPut();
                                 }
                         );
@@ -110,26 +107,48 @@ public class GDBController {
     protected void RunExeFile(ActionEvent event)
     {
         model.setInput("run");
-//        code.getSelectionModel().select(getNextLineNumber());
+        model.getOutPut();//redundant output
+        nextMarkedLine();
     }
 
     @FXML
     protected void Step(ActionEvent event){
         model.setInput("next");
-//        code.getSelectionModel().select(getNextLineNumber());
+        model.getOutPut();//redundant output
+        nextMarkedLine();
     }
 
     @FXML
     protected void StepIn(ActionEvent event){
         model.setInput("step");
-//        code.getSelectionModel().select(getNextLineNumber());
+        model.getOutPut();//redundant output
+        nextMarkedLine();
     }
 
-    private int getNextLineNumber(){
-        String[] out = model.getOutPut().split("\n");
-        int index = out.length-2;
-        char c = out[index].toCharArray()[0];
-        int lineNumber = (int)c - 48 - 1;
-        return lineNumber;
+    private void nextMarkedLine(){
+        model.setInput("info source");
+        String out = model.getOutPut();
+        String[] splittedOut = out.split("\n");
+        if(splittedOut[2].startsWith("Located in")){
+            String sourceFilePath = splittedOut[2].substring(splittedOut[2].indexOf('/'));
+            for(Tab sourceFileTab : sourceFiles.getTabs())
+                if(sourceFileTab.getTooltip().getText().equals(sourceFilePath)){
+                    sourceFiles.getSelectionModel().select(sourceFileTab);
+                    break;
+                }
+        }
+
+        int lineNumber;
+        model.setInput("frame");
+        out = model.getOutPut();
+        String lineNumberString = out.substring(out.indexOf(":")+1,out.indexOf("\n"));
+        try {
+            lineNumber = Integer.parseInt(lineNumberString) - 1;
+            Tab selectedSourceFileTab = sourceFiles.getSelectionModel().getSelectedItem();
+            ListView code = ((ListView) selectedSourceFileTab.getContent());
+            code.getSelectionModel().select(lineNumber);
+        }
+        catch (NumberFormatException e) {
+        }
     }
 }
