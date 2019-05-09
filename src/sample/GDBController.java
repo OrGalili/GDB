@@ -54,7 +54,6 @@ public class GDBController {
         File file = f.showOpenDialog(((MenuItem)event.getTarget()).getParentPopup().getOwnerWindow());
         String exeFilePath = file.getAbsolutePath();
         System.out.println(exeFilePath);
-//        String absolutePath = "'"+file.getAbsolutePath()+"'";
         model.setInput("file '"+exeFilePath+"'");
         String loadingExeFileMessage = model.getOutPut();
         loadingExeFileMessage = loadingExeFileMessage.substring(0,loadingExeFileMessage.indexOf('\n'));
@@ -125,6 +124,16 @@ public class GDBController {
             StepOutBtn.setDisable(false);
             ContinueBtn.setDisable(false);
         }
+
+        else{
+            loadingExeFileMessage = loadingExeFileMessage.substring(loadingExeFileMessage.indexOf(":")+1);
+            Alert windowErr = new Alert(Alert.AlertType.ERROR, loadingExeFileMessage);
+            windowErr.getDialogPane().setPrefWidth(270.0);
+            windowErr.setTitle("Load File Error");
+            windowErr.setHeaderText(null);
+            windowErr.setResizable(true);
+            windowErr.showAndWait();
+        }
     }
 
     @FXML
@@ -182,9 +191,6 @@ public class GDBController {
         String lineNumberString = out.substring(out.indexOf(":")+1,out.indexOf("\n"));
         try {
             lineNumber = Integer.parseInt(lineNumberString) - 1;
-//            Tab selectedSourceFileTab = sourceFiles.getSelectionModel().getSelectedItem();
-//            ListView code = ((ListView) selectedSourceFileTab.getContent());
-//            code.getSelectionModel().select(lineNumber);
             getFocusedSourceFile().getSelectionModel().select(lineNumber);
         }
         catch (NumberFormatException e) {
