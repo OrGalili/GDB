@@ -40,6 +40,13 @@ public class GDBController {
     @FXML
     public Button ContinueBtn;
 
+    @FXML
+    public Button StopRunBtn;
+
+    @FXML
+    public Button StopDebugBtn;
+
+
     public GDBController() throws Exception {
         this.model = new GDBModel();
         model.GDBStart();
@@ -121,10 +128,7 @@ public class GDBController {
                 );
 
                 RunBtn.setDisable(false);
-                StepBtn.setDisable(false);
-                StepInBtn.setDisable(false);
-                StepOutBtn.setDisable(false);
-                ContinueBtn.setDisable(false);
+                disableRunningModeButtons(true);
             } else {
                 loadingExeFileMessage = loadingExeFileMessage.substring(loadingExeFileMessage.indexOf(":") + 1);
                 Alert windowErr = new Alert(Alert.AlertType.ERROR, loadingExeFileMessage);
@@ -142,35 +146,89 @@ public class GDBController {
     {
         model.setInput("run");
         model.getOutPut();//redundant output
-        nextMarkedLine();
+        if(isFinishRunning()) {
+            getFocusedSourceFile().getSelectionModel().select(-1);
+            disableRunningModeButtons(true);
+        }
+        else {
+            nextMarkedLine();
+            disableRunningModeButtons(false);
+        }
+    }
+
+    private boolean isFinishRunning(){
+        model.setInput("info program");
+        if(model.getOutPut().contains("The program being debugged is not being run."))
+            return true;
+        return false;
     }
 
     @FXML
     protected void Step(ActionEvent event){
         model.setInput("next");
         model.getOutPut();//redundant output
-        nextMarkedLine();
+        if(isFinishRunning()) {
+            getFocusedSourceFile().getSelectionModel().select(-1);
+            disableRunningModeButtons(true);
+        }
+        else {
+            nextMarkedLine();
+        }
     }
 
     @FXML
     protected void StepIn(ActionEvent event){
         model.setInput("step");
         model.getOutPut();//redundant output
-        nextMarkedLine();
+        if(isFinishRunning()) {
+            getFocusedSourceFile().getSelectionModel().select(-1);
+            disableRunningModeButtons(true);
+        }
+        else {
+            nextMarkedLine();
+        }
     }
 
     @FXML
     protected void StepOut(ActionEvent event){
         model.setInput("finish");
         model.getOutPut();//redundant output
-        nextMarkedLine();
+        if(isFinishRunning()) {
+            getFocusedSourceFile().getSelectionModel().select(-1);
+            disableRunningModeButtons(true);
+        }
+        else {
+            nextMarkedLine();
+        }
     }
 
     @FXML
     protected void Continue(ActionEvent event){
         model.setInput("continue");
         model.getOutPut();//redundant output
+        if(isFinishRunning()) {
+            getFocusedSourceFile().getSelectionModel().select(-1);
+            disableRunningModeButtons(true);
+        }
+        else {
+            nextMarkedLine();
+        }
+    }
+
+    @FXML
+    protected void StopDebug(ActionEvent event){
+        model.setInput("detach");
+        model.getOutPut();//redundant output
         getFocusedSourceFile().getSelectionModel().select(-1);
+        disableRunningModeButtons(true);
+    }
+
+    @FXML
+    protected void StopRun(ActionEvent event){
+        model.setInput("kill");
+        model.getOutPut();//redundant output
+        getFocusedSourceFile().getSelectionModel().select(-1);
+        disableRunningModeButtons(true);
     }
 
     private void nextMarkedLine(){
@@ -201,5 +259,14 @@ public class GDBController {
     private ListView getFocusedSourceFile(){
         Tab selectedSourceFileTab = sourceFiles.getSelectionModel().getSelectedItem();
         return ((ListView) selectedSourceFileTab.getContent());
+    }
+
+    private void disableRunningModeButtons(boolean disableMode){
+        StepBtn.setDisable(disableMode);
+        StepInBtn.setDisable(disableMode);
+        StepOutBtn.setDisable(disableMode);
+        ContinueBtn.setDisable(disableMode);
+        StopRunBtn.setDisable(disableMode);
+        StopDebugBtn.setDisable(disableMode);
     }
 }

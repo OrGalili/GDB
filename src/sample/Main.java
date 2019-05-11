@@ -12,7 +12,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("GDBView.fxml"));
         primaryStage.setTitle("GDB UI");
-        primaryStage.setScene(new Scene(root, 400, 640));
+        primaryStage.setScene(new Scene(root, 560, 700));
         primaryStage.show();
     }
 
