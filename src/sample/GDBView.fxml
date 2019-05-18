@@ -4,6 +4,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.text.TextFlow?>
+<?import javafx.scene.text.Text?>
+
+
+<?import java.net.URL?>
+<?import javafx.collections.FXCollections?>
 <GridPane alignment="CENTER" hgap="10.0" prefWidth="259.0" minWidth="400" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.GDBController">
   <GridPane prefHeight="237.0" prefWidth="259.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
     <children>
@@ -27,20 +33,25 @@
       </ToolBar>
       <TabPane fx:id="sourceFiles" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="1" />
       <!--<ListView fx:id="code" prefWidth="200.0" GridPane.rowIndex="2" GridPane.columnIndex="0"  />-->
-      <TabPane prefHeight="300.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0" GridPane.rowIndex="2">
+      <TabPane  prefHeight="300.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0" GridPane.rowIndex="2">
         <tabs>
           <Tab text="Call Stack">
             <content>
-              <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <children>
-                  <TableView layoutX="0.0" layoutY="0.0" prefHeight="82.00009999999747" prefWidth="259.0">
-                    <columns>
-                      <TableColumn prefWidth="75.0" text="Column X" />
-                      <TableColumn prefWidth="75.0" text="Column X" />
-                    </columns>
-                  </TableView>
-                </children>
-              </AnchorPane>
+            <ScrollPane>
+              <TableView fx:id="Stack" editable="false">
+                <columns>
+                  <TableColumn text="#"/>
+                  <TableColumn text="Function"/>
+                  <TableColumn text="Class"/>
+                  <TableColumn text="Line"/>
+                </columns>
+                <items >
+                  <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Empty Stack"/>
+                  </FXCollections>
+                </items>
+              </TableView>
+            </ScrollPane>
             </content>
           </Tab>
           <Tab text="Breakpoints">
@@ -50,7 +61,12 @@
           </Tab>
           <Tab text="Output">
             <content>
-              <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <ScrollPane fx:id="IOPane">
+                  <TextFlow style="-fx-text-fill: #00ff00;">
+                      <Text fx:id="OutputText"></Text>
+                      <TextField fx:id="InputText" ></TextField>
+                  </TextFlow>
+                </ScrollPane>
             </content>
           </Tab>
           <Tab text="Variables">
@@ -77,7 +93,6 @@
       <RowConstraints vgrow="NEVER" />
       <RowConstraints vgrow="ALWAYS" />
       <RowConstraints vgrow="NEVER" />
-      <!--<RowConstraints vgrow="NEVER" />-->
     </rowConstraints>
   </GridPane>
   <columnConstraints>
@@ -86,4 +101,7 @@
   <rowConstraints>
     <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
   </rowConstraints>
+  <stylesheets>
+    <URL value="@CSS.css" />
+  </stylesheets>
 </GridPane>
