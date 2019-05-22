@@ -333,7 +333,7 @@ public class GDBController implements Initializable {
                         allMostStackLines[i-1] += " "+allMostStackLines[i].trim();
                     }
                 }
-                List<String> StackLines = Arrays.stream(allMostStackLines).filter(sl-> !sl.startsWith(" ")).collect(toList());
+                List<String> StackLines = Arrays.stream(allMostStackLines).filter(sl-> !sl.startsWith(" ") && !sl.startsWith("\t")).collect(toList());
                 List<String[]> frameLineSpaceSplitted = StackLines.stream().map(sl -> sl.split(" ")).collect(toList());
                 List<FrameInfo> frameList = frameLineSpaceSplitted.stream().map(sl -> new FrameInfo(sl[0].substring(1),sl[sl.length - 1].split(":")[0], sl[sl.length - 4],  sl[sl.length - 1].split(":")[1])).collect(toList());
                 Stack.getItems().addAll(frameList);
@@ -354,7 +354,8 @@ public class GDBController implements Initializable {
                 String[] BreakpointsLines = out.split("\n");
                 Collection<String> BreakpointsList = new ArrayList(Arrays.asList(BreakpointsLines));
                 ((ArrayList<String>) BreakpointsList).remove(0);//titles
-                List<String[]> frameLineSpaceSplitted = BreakpointsList.stream().map(bp -> bp.split(" ")).collect(toList());
+                List<String> x = BreakpointsList.stream().filter(sl-> !sl.startsWith(" ") && !sl.startsWith("\t")).collect(toList());
+                List<String[]> frameLineSpaceSplitted = x.stream().map(bp -> bp.split(" ")).collect(toList());
                 List<FrameInfo> frameList = frameLineSpaceSplitted.stream().map(bp -> new FrameInfo(bp[0],bp[bp.length - 1].split(":")[0],bp[bp.length - 3],bp[bp.length - 1].split(":")[1])).collect(toList());
                 Breakpoints.getItems().addAll(frameList);
             }
