@@ -7,6 +7,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -15,11 +16,12 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
-public class GDBController {
+public class GDBController implements Initializable {
     private GDBModel model;
 
     @FXML
@@ -56,6 +58,9 @@ public class GDBController {
     public TableView<FrameInfo> Stack;
 
     @FXML
+    public TableView<FrameInfo> Breakpoints;
+
+    @FXML
     public Text OutputText;
 
     public GDBController() throws Exception {
@@ -65,10 +70,40 @@ public class GDBController {
         model.getOutPut();
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        sourceFiles.getSelectionModel().selectedItemProperty().addListener(
+                new ChangeListener<Tab>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Tab> ov, Tab oldValue, Tab newValue) {
+                        model.setInput("list " + newValue.getTooltip().getText() + ":0");
+                        model.getOutPut();
+                    }
+                }
+        );
+
+        Stack.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            goTo(obs, oldSelection, newSelection);
+        });
+
+        Breakpoints.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            goTo(obs, oldSelection, newSelection);
+        });
+    }
+
+    private void goTo(Object obs,FrameInfo oldSelection, FrameInfo newSelection){
+        if (newSelection != null) {
+            java.util.Optional<Tab> seletedTab = sourceFiles.getTabs().stream().filter(s-> s.getTooltip().getText().endsWith(newSelection.getClassName())).findFirst();
+            if(seletedTab.isPresent()) {
+                sourceFiles.getSelectionModel().select(seletedTab.get());
+                getFocusedSourceFile().getSelectionModel().select(Integer.parseInt(newSelection.getLineNumber()) - 1 );
+            }
+        }
+    }
+
     @FXML
     protected void OpenExeFile(ActionEvent event)
     {
-        IOPane.setVvalue(1);
         FileChooser f = new FileChooser();
         File file = f.showOpenDialog(((MenuItem)event.getTarget()).getParentPopup().getOwnerWindow());
         if(file !=null) {
@@ -78,6 +113,8 @@ public class GDBController {
             String loadingExeFileMessage = model.getOutPut();
             if (loadingExeFileMessage.contains("Reading symbols from " + exeFilePath + "...done.")) {
                 sourceFiles.getTabs().clear();
+                Stack.getItems().clear();
+                Breakpoints.getItems().clear();
                 model.setInput("info sources");
                 Collection<String> linesSources = new ArrayList(Arrays.asList(model.getOutPut().split("\n")));
                 ((ArrayList<String>) linesSources).remove(0);
@@ -113,6 +150,7 @@ public class GDBController {
                                             } else
                                                 model.setInput("clear " + item.substring(0, item.indexOf('\t')));
                                             model.getOutPut();
+                                            updateBreakpoints();
                                         }
                                 );
                                 return observable;
@@ -126,16 +164,6 @@ public class GDBController {
                 sourceFiles.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
                 model.setInput("list " + sourceFiles.getSelectionModel().getSelectedItem().getTooltip().getText() + ":0");
                 model.getOutPut();
-
-                sourceFiles.getSelectionModel().selectedItemProperty().addListener(
-                        new ChangeListener<Tab>() {
-                            @Override
-                            public void changed(ObservableValue<? extends Tab> ov, Tab oldValue, Tab newValue) {
-                                model.setInput("list " + newValue.getTooltip().getText() + ":0");
-                                model.getOutPut();
-                            }
-                        }
-                );
 
                 RunBtn.setDisable(false);
                 disableRunningModeButtons(true);
@@ -293,31 +321,48 @@ public class GDBController {
     }
 
     private void updateStack(){
-        //when step in , in the end of run there is exception maybe related to this function
         Stack.getItems().clear();
-        Stack.getColumns().clear();
         model.setInput("bt");
         String out = model.getOutPut();
-        out = out.substring(0, out.length() - 6);
-        String[] StackLines = out.split("\n");
-        java.util.List<String> StackList = Arrays.asList(StackLines);
+        if(!out.equals("No stack.\n(gdb) ")) {
+            try {
+                out = out.substring(0, out.length() - 6);
+                String[] allMostStackLines = out.split("\n");
+                for(int i=0;i<allMostStackLines.length;i++){
+                    if(allMostStackLines[i].startsWith(" ")) {
+                        allMostStackLines[i-1] += " "+allMostStackLines[i].trim();
+                    }
+                }
+                List<String> StackLines = Arrays.stream(allMostStackLines).filter(sl-> !sl.startsWith(" ")).collect(toList());
+                List<String[]> frameLineSpaceSplitted = StackLines.stream().map(sl -> sl.split(" ")).collect(toList());
+                List<FrameInfo> frameList = frameLineSpaceSplitted.stream().map(sl -> new FrameInfo(sl[0].substring(1),sl[sl.length - 1].split(":")[0], sl[sl.length - 4],  sl[sl.length - 1].split(":")[1])).collect(toList());
+                Stack.getItems().addAll(frameList);
+            }
+            catch(Exception e) {
 
-        List<String[]> frameLineSpaceSplitted = StackList.stream().map(s1-> s1.split(" ")).collect(toList());
-        List<FrameInfo> frameList =  frameLineSpaceSplitted.stream().map(s2-> new FrameInfo(s2[0].substring(1),s2[s2.length-4],s2[s2.length-1].split(":")[0],s2[s2.length-1].split(":")[1])).collect(toList());
-
-        TableColumn frameNumberColumn = new TableColumn("#");
-        frameNumberColumn.setCellValueFactory(new PropertyValueFactory<>("frameNumber"));
-        TableColumn funcColumn = new TableColumn("Function");
-        funcColumn.setCellValueFactory(new PropertyValueFactory<>("funcName"));
-        TableColumn classColumn = new TableColumn("Class");
-        classColumn.setCellValueFactory(new PropertyValueFactory<>("className"));
-        TableColumn lineColumn = new TableColumn("Line");
-        lineColumn.setCellValueFactory(new PropertyValueFactory<>("lineNumber"));
-        Stack.getColumns().addAll(frameNumberColumn, funcColumn, classColumn,lineColumn);
-
-        Stack.getItems().addAll(frameList);
+            }
+        }
     }
 
+    private void updateBreakpoints(){
+        Breakpoints.getItems().clear();
+        model.setInput("info breakpoints");
+        String out = model.getOutPut();
+        if(!out.equals("No breakpoints or watchpoints.\n(gdb) ")) {
+            try {
+                out = out.substring(0, out.length() - 6);
+                String[] BreakpointsLines = out.split("\n");
+                Collection<String> BreakpointsList = new ArrayList(Arrays.asList(BreakpointsLines));
+                ((ArrayList<String>) BreakpointsList).remove(0);//titles
+                List<String[]> frameLineSpaceSplitted = BreakpointsList.stream().map(bp -> bp.split(" ")).collect(toList());
+                List<FrameInfo> frameList = frameLineSpaceSplitted.stream().map(bp -> new FrameInfo(bp[0],bp[bp.length - 1].split(":")[0],bp[bp.length - 3],bp[bp.length - 1].split(":")[1])).collect(toList());
+                Breakpoints.getItems().addAll(frameList);
+            }
+            catch(Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
 
     //Refreshing to bottom
     private void RefreshInputOutPutPane()
@@ -326,4 +371,6 @@ public class GDBController {
         IOPane.layout();
         IOPane.setVvalue(1);
     }
+
+
 }

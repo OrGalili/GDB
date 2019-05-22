@@ -10,6 +10,8 @@
 
 <?import java.net.URL?>
 <?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?language javascript?>
 <GridPane alignment="CENTER" hgap="10.0" prefWidth="259.0" minWidth="400" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.GDBController">
   <GridPane prefHeight="237.0" prefWidth="259.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
     <children>
@@ -38,25 +40,61 @@
           <Tab text="Call Stack">
             <content>
             <ScrollPane>
-              <TableView fx:id="Stack" editable="false">
+              <TableView fx:id="Stack" editable="false" >
                 <columns>
-                  <TableColumn text="#"/>
-                  <TableColumn text="Function"/>
-                  <TableColumn text="Class"/>
-                  <TableColumn text="Line"/>
+                  <TableColumn text="#">
+                    <cellValueFactory>
+                      <PropertyValueFactory property="frameNumber"></PropertyValueFactory>
+                    </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn text="Class">
+                    <cellValueFactory>
+                      <PropertyValueFactory property="className"></PropertyValueFactory>
+                    </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn text="Function">
+                    <cellValueFactory>
+                      <PropertyValueFactory property="funcName"></PropertyValueFactory>
+                    </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn text="Line">
+                    <cellValueFactory>
+                      <PropertyValueFactory property="lineNumber"></PropertyValueFactory>
+                    </cellValueFactory>
+                  </TableColumn>
                 </columns>
-                <items >
-                  <FXCollections fx:factory="observableArrayList">
-                    <String fx:value="Empty Stack"/>
-                  </FXCollections>
-                </items>
               </TableView>
             </ScrollPane>
             </content>
           </Tab>
           <Tab text="Breakpoints">
             <content>
-              <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <ScrollPane>
+                <TableView fx:id="Breakpoints" editable="false" >
+                  <columns>
+                    <TableColumn text="#">
+                      <cellValueFactory>
+                        <PropertyValueFactory property="frameNumber"></PropertyValueFactory>
+                      </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Class">
+                      <cellValueFactory>
+                        <PropertyValueFactory property="className"></PropertyValueFactory>
+                      </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Function">
+                      <cellValueFactory>
+                        <PropertyValueFactory property="funcName"></PropertyValueFactory>
+                      </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Line">
+                      <cellValueFactory>
+                        <PropertyValueFactory property="lineNumber"></PropertyValueFactory>
+                      </cellValueFactory>
+                    </TableColumn>
+                  </columns>
+                </TableView>
+              </ScrollPane>
             </content>
           </Tab>
           <Tab text="Output">

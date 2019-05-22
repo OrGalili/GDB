@@ -7,8 +7,14 @@ public class FrameInfo {
     private  String className;
     private  String lineNumber;
 
-    public FrameInfo(String frameNumber ,String funcName, String className, String lineNumber) {
+    public FrameInfo(String frameNumber ,String className, String funcName, String lineNumber) {
         this.frameNumber = frameNumber;
+        this.funcName = funcName;
+        this.className = className;
+        this.lineNumber = lineNumber;
+    }
+
+    public FrameInfo(String className, String funcName, String lineNumber) {
         this.funcName = funcName;
         this.className = className;
         this.lineNumber = lineNumber;
