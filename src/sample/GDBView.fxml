@@ -9,7 +9,6 @@
 
 
 <?import java.net.URL?>
-<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?language javascript?>
 <GridPane alignment="CENTER" hgap="10.0" prefWidth="259.0" minWidth="400" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.GDBController">
@@ -38,64 +37,62 @@
       <TabPane  prefHeight="300.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0" GridPane.rowIndex="2">
         <tabs>
           <Tab text="Call Stack">
-            <content>
-            <ScrollPane>
-              <TableView fx:id="Stack" editable="false" >
-                <columns>
-                  <TableColumn text="#">
-                    <cellValueFactory>
-                      <PropertyValueFactory property="frameNumber"></PropertyValueFactory>
-                    </cellValueFactory>
-                  </TableColumn>
-                  <TableColumn text="Class">
-                    <cellValueFactory>
-                      <PropertyValueFactory property="className"></PropertyValueFactory>
-                    </cellValueFactory>
-                  </TableColumn>
-                  <TableColumn text="Function">
-                    <cellValueFactory>
-                      <PropertyValueFactory property="funcName"></PropertyValueFactory>
-                    </cellValueFactory>
-                  </TableColumn>
-                  <TableColumn text="Line">
-                    <cellValueFactory>
-                      <PropertyValueFactory property="lineNumber"></PropertyValueFactory>
-                    </cellValueFactory>
-                  </TableColumn>
-                </columns>
-              </TableView>
-            </ScrollPane>
-            </content>
+            <TableView fx:id="Stack" editable="false">
+              <placeholder>
+                <Label text=""/>
+              </placeholder>
+              <columns>
+                <TableColumn text="#" prefWidth="35">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="frameNumber"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Class" prefWidth="200">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="className"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Function" prefWidth="260">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="funcName"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Line" prefWidth="65">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="lineNumber"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+              </columns>
+            </TableView>
           </Tab>
           <Tab text="Breakpoints">
-            <content>
-              <ScrollPane>
-                <TableView fx:id="Breakpoints" editable="false" >
-                  <columns>
-                    <TableColumn text="#">
-                      <cellValueFactory>
-                        <PropertyValueFactory property="frameNumber"></PropertyValueFactory>
-                      </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Class">
-                      <cellValueFactory>
-                        <PropertyValueFactory property="className"></PropertyValueFactory>
-                      </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Function">
-                      <cellValueFactory>
-                        <PropertyValueFactory property="funcName"></PropertyValueFactory>
-                      </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Line">
-                      <cellValueFactory>
-                        <PropertyValueFactory property="lineNumber"></PropertyValueFactory>
-                      </cellValueFactory>
-                    </TableColumn>
-                  </columns>
-                </TableView>
-              </ScrollPane>
-            </content>
+            <TableView fx:id="Breakpoints" editable="false" >
+              <placeholder>
+                <Label text=""/>
+              </placeholder>
+              <columns>
+                <TableColumn text="#" prefWidth="35">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="frameNumber"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Class" prefWidth="200">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="className"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Function" prefWidth="260">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="funcName"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Line" prefWidth="65">
+                  <cellValueFactory>
+                    <PropertyValueFactory property="lineNumber"></PropertyValueFactory>
+                  </cellValueFactory>
+                </TableColumn>
+              </columns>
+            </TableView>
           </Tab>
           <Tab text="Output">
             <content>
@@ -108,18 +105,15 @@
             </content>
           </Tab>
           <Tab text="Variables">
-            <content>
-              <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <children>
-                  <TableView layoutX="0.0" layoutY="0.0" prefHeight="82.00009999999747" prefWidth="259.0">
-                    <columns>
-                      <TableColumn prefWidth="75.0" text="Name" />
-                      <TableColumn prefWidth="75.0" text="Value" />
-                    </columns>
-                  </TableView>
-                </children>
-              </AnchorPane>
-            </content>
+            <TableView layoutX="0.0" layoutY="0.0" prefHeight="82.00009999999747" prefWidth="259.0">
+              <placeholder>
+                <Label text=""/>
+              </placeholder>
+              <columns>
+                <TableColumn prefWidth="75.0" text="Name" />
+                <TableColumn prefWidth="75.0" text="Value" />
+              </columns>
+            </TableView>
           </Tab>
         </tabs>
       </TabPane>

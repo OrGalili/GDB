@@ -13,6 +13,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("GDBView.fxml"));
         primaryStage.setTitle("GDB UI");
         primaryStage.setScene(new Scene(root, 560, 700));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 

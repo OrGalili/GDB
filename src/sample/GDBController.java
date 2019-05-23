@@ -97,6 +97,7 @@ public class GDBController implements Initializable {
             if(seletedTab.isPresent()) {
                 sourceFiles.getSelectionModel().select(seletedTab.get());
                 getFocusedSourceFile().getSelectionModel().select(Integer.parseInt(newSelection.getLineNumber()) - 1 );
+                getFocusedSourceFile().scrollTo(Integer.parseInt(newSelection.getLineNumber()) - 1  - 6);//window set resizable false
             }
         }
     }
@@ -123,7 +124,8 @@ public class GDBController implements Initializable {
                 linesSources.remove("(gdb) ");
                 for (String ls : linesSources) {
                     String[] filePaths = ls.split(",");
-                    for (String fp : filePaths) {
+                    List<String> sourcefilePaths = Arrays.stream(filePaths).filter(fp-> fp.endsWith(".c") || fp.endsWith(".cpp")).collect(toList());
+                    for (String fp : sourcefilePaths) {
                         if (fp.length() > 1 && !fp.endsWith(".h")) {
                             Tab tab = new Tab();
                             String fileName = fp.substring(fp.lastIndexOf("/") + 1);
@@ -256,6 +258,7 @@ public class GDBController implements Initializable {
         }
         RefreshInputOutPutPane();
         updateStack();
+
     }
 
     @FXML
@@ -294,6 +297,7 @@ public class GDBController implements Initializable {
         try {
             lineNumber = Integer.parseInt(lineNumberString) - 1;
             getFocusedSourceFile().getSelectionModel().select(lineNumber);
+            getFocusedSourceFile().scrollTo(lineNumber - 6);//window set resizable false
         }
         catch (NumberFormatException e) {
         }
