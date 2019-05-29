@@ -24,7 +24,7 @@
             </Menu>
           </menus>
         </MenuBar>
-        <Button fx:id="RunBtn" onAction="#RunExeFile" text="run" disable="true" />
+        <Button fx:id="RunBtn" onAction="#RunExeFile" text="run" disable="true"  />
         <Button fx:id="StepBtn" onAction="#Step" text="step" disable="true"/>
         <Button fx:id="StepInBtn" onAction="#StepIn" text="step in" disable="true"/>
         <Button fx:id="StepOutBtn" onAction="#StepOut" text="step out" disable="true"/>

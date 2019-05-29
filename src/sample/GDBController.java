@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -11,7 +12,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
@@ -56,6 +56,8 @@ public class GDBController implements Initializable {
 
     @FXML
     public TableView<FrameInfo> Stack;
+
+    private List<FrameInfo> breakpointsFrameList;
 
     @FXML
     public TableView<FrameInfo> Breakpoints;
@@ -102,6 +104,36 @@ public class GDBController implements Initializable {
         }
     }
 
+    private void onCheckBoxClicked(boolean wasSelected,boolean isNowSelected, String codeLine){
+        //System.out.println("Check box for "+item+" changed from "+wasSelected+" to "+isNowSelected);
+        if (isNowSelected) {
+            model.setInput("break " + codeLine.substring(0, codeLine.indexOf('\t')));
+        } else
+            model.setInput("clear " + codeLine.substring(0, codeLine.indexOf('\t')));
+        model.getOutPut();
+        updateBreakpoints();
+    }
+
+    private ObservableValue<Boolean> refreshCheckboxCelll(String item){
+        BooleanProperty observable = new SimpleBooleanProperty();
+        String lineNumber;
+        String fileName;
+        if(Breakpoints.getItems().size() > 0) {
+            lineNumber = item.substring(0, item.indexOf('\t'));
+            fileName = sourceFiles.getSelectionModel().getSelectedItem().getText();
+
+            if (Breakpoints.getItems().stream().anyMatch(bp -> bp.getLineNumber().equals(lineNumber) && bp.getClassName().equals(fileName))) {
+                observable.set(true);
+            }
+        }
+        observable.addListener((obs, wasSelected, isNowSelected) ->
+                {
+                    onCheckBoxClicked(wasSelected, isNowSelected, item);
+                }
+        );
+        return observable;
+    }
+
     @FXML
     protected void OpenExeFile(ActionEvent event)
     {
@@ -143,21 +175,8 @@ public class GDBController implements Initializable {
                             java.util.List<String> lines = Arrays.asList(codeLines);
                             code.setItems(FXCollections.observableList(lines));
                             code.setCellFactory(CheckBoxListCell.forListView((Callback<String, ObservableValue<Boolean>>) item -> {
-                                BooleanProperty observable = new SimpleBooleanProperty();
-                                observable.addListener((obs, wasSelected, isNowSelected) ->
-                                        {
-                                            //System.out.println("Check box for "+item+" changed from "+wasSelected+" to "+isNowSelected);
-                                            if (!wasSelected) {
-                                                model.setInput("break " + item.substring(0, item.indexOf('\t')));
-                                            } else
-                                                model.setInput("clear " + item.substring(0, item.indexOf('\t')));
-                                            model.getOutPut();
-                                            updateBreakpoints();
-                                        }
-                                );
-                                return observable;
+                                 return refreshCheckboxCelll(item);
                             }));
-
                             tab.setContent(code);
                             sourceFiles.getTabs().add(tab);
                         }
@@ -182,99 +201,100 @@ public class GDBController implements Initializable {
     }
 
     @FXML
-    protected void RunExeFile(ActionEvent event)
-    {
-        model.setInput("run");
-        OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
-        if(isFinishedRunning()) {
-            getFocusedSourceFile().getSelectionModel().select(-1);
-            disableRunningModeButtons(true);
-        }
-        else {
-            nextMarkedLine();
-            disableRunningModeButtons(false);
-        }
-        RefreshInputOutPutPane();
-        updateStack();
+    protected void RunExeFile(ActionEvent event) {
+        new Thread() {
+            public void run() {
+                disableRunningModeButtons(true);
+                model.setInput("run");
+                OutputText.setText(OutputText.getText() + model.getOutPut());//redundant output
+                updateUI();
+        }}.start();
     }
 
 
 
     @FXML
     protected void Step(ActionEvent event){
-        model.setInput("next");
-        OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
-        if(isFinishedRunning()) {
-            getFocusedSourceFile().getSelectionModel().select(-1);
+        new Thread() { public void run() {
             disableRunningModeButtons(true);
-        }
-        else {
-            nextMarkedLine();
-        }
-        RefreshInputOutPutPane();
-        updateStack();
+            model.setInput("next");
+            OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
+            updateUI();
+        }}.start();
     }
 
     @FXML
-    protected void StepIn(ActionEvent event){
-        model.setInput("step");
-        OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
-        if(isFinishedRunning()) {
-            getFocusedSourceFile().getSelectionModel().select(-1);
-            disableRunningModeButtons(true);
-        }
-        else {
-            nextMarkedLine();
-        }
-        RefreshInputOutPutPane();
-        updateStack();
+    protected void StepIn(ActionEvent event) {
+        new Thread() {
+            public void run() {
+                disableRunningModeButtons(true);
+                model.setInput("step");
+                OutputText.setText(OutputText.getText() + model.getOutPut());//redundant output
+                updateUI();
+            }
+        }.start();
     }
 
     @FXML
-    protected void StepOut(ActionEvent event){
-        model.setInput("finish");
-        OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
-        if(isFinishedRunning()) {
-            getFocusedSourceFile().getSelectionModel().select(-1);
-            disableRunningModeButtons(true);
-        }
-        else {
-            nextMarkedLine();
-        }
-        RefreshInputOutPutPane();
-        updateStack();
+    protected void StepOut(ActionEvent event) {
+        new Thread() {
+            public void run() {
+                disableRunningModeButtons(true);
+                model.setInput("finish");
+                OutputText.setText(OutputText.getText() + model.getOutPut());//redundant output
+                updateUI();
+            }
+        }.start();
     }
 
     @FXML
     protected void Continue(ActionEvent event){
-        model.setInput("continue");
-        OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
-        if(isFinishedRunning()) {
-            getFocusedSourceFile().getSelectionModel().select(-1);
-            disableRunningModeButtons(true);
-        }
-        else {
-            nextMarkedLine();
-        }
-        RefreshInputOutPutPane();
-        updateStack();
+        new Thread() {
+            public void run() {
+                disableRunningModeButtons(true);
+                model.setInput("continue");
+                OutputText.setText(OutputText.getText() + model.getOutPut());//redundant output
+                updateUI();
+            }}.start();
+    }
 
+    private void updateUI(){
+        if (isFinishedRunning()) {
+            getFocusedSourceFile().getSelectionModel().select(-1);
+        } else {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    //Update UI here
+                    nextMarkedLine();
+                }
+            });
+            disableRunningModeButtons(false);
+        }
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                //Update UI here
+                RefreshInputOutPutPane();
+                updateStack();
+            }
+        });
     }
 
     @FXML
     protected void StopDebug(ActionEvent event){
+        disableRunningModeButtons(true);
         model.setInput("detach");
         OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
         getFocusedSourceFile().getSelectionModel().select(-1);
-        disableRunningModeButtons(true);
     }
 
     @FXML
     protected void StopRun(ActionEvent event){
+        disableRunningModeButtons(true);
         model.setInput("kill");
         model.getOutPut();//redundant output
         getFocusedSourceFile().getSelectionModel().select(-1);
-        disableRunningModeButtons(true);
     }
 
     private void nextMarkedLine(){
@@ -310,6 +330,7 @@ public class GDBController implements Initializable {
 
     private boolean isFinishedRunning(){
         model.setInput("info program");
+        //model.setInput("cd ..");
         if(model.getOutPut().contains("The program being debugged is not being run."))
             return true;
         return false;
@@ -349,6 +370,8 @@ public class GDBController implements Initializable {
     }
 
     private void updateBreakpoints(){
+        if(breakpointsFrameList != null)
+            breakpointsFrameList.clear();
         Breakpoints.getItems().clear();
         model.setInput("info breakpoints");
         String out = model.getOutPut();
@@ -360,8 +383,8 @@ public class GDBController implements Initializable {
                 ((ArrayList<String>) BreakpointsList).remove(0);//titles
                 List<String> x = BreakpointsList.stream().filter(sl-> !sl.startsWith(" ") && !sl.startsWith("\t")).collect(toList());
                 List<String[]> frameLineSpaceSplitted = x.stream().map(bp -> bp.split(" ")).collect(toList());
-                List<FrameInfo> frameList = frameLineSpaceSplitted.stream().map(bp -> new FrameInfo(bp[0],bp[bp.length - 1].split(":")[0],bp[bp.length - 3],bp[bp.length - 1].split(":")[1])).collect(toList());
-                Breakpoints.getItems().addAll(frameList);
+                breakpointsFrameList = frameLineSpaceSplitted.stream().map(bp -> new FrameInfo(bp[0],bp[bp.length - 1].split(":")[0],bp[bp.length - 3],bp[bp.length - 1].split(":")[1])).collect(toList());
+                Breakpoints.getItems().addAll(breakpointsFrameList);
             }
             catch(Exception e) {
                 System.out.println(e);

@@ -52,14 +52,20 @@ public class GDBModel {
         char c;
         String GDBOutput = "";
         try {
-
+            Thread.sleep(15);//15
             while (true) {
+                //
+               /* inpState = bufferedReader.ready();
+                if (inpState == false)
+                    break;*/
+                //
                 ascii = bufferedReader.read();
                 c = (char) ascii;
                 System.out.print(c);
                 GDBOutput += c;
                 inpState = bufferedReader.ready();
-                if (inpState == false && GDBOutput.endsWith("(gdb) "))
+//              if (inpState == false && GDBOutput.endsWith("(gdb) "))
+                if (inpState == false)
                     break;
             }
         } catch (Exception e) {

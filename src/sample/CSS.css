@@ -31,6 +31,29 @@
     /*-fx-text-fill: white;*/
 }
 
+.check-box > .box{
+    /*the color of the in box checkbox*/
+    -fx-background-color: transparent;
+    /*the color of the border*/
+    -fx-border-color: gray;
+}
+
+.check-box:selected > .box {
+    /* background color for selected checkbox */
+    -fx-background-color: red;
+}
+.check-box:selected > .box > .mark,
+.check-box:indeterminate  > .box > .mark {
+    /* modify mark color */
+    -fx-background-color: transparent;
+
+}
+
+/*.check-box .mark {
+    -fx-shape:
+            "M2,0L5,4L8,0L10,0L10,2L6,5L10,8L10,10L8,10L5,6L2,10L0,10L0,8L4,5L0,2L0,0Z";
+}*/
+
 .text-field{
     -fx-background-color: transparent;
     -fx-text-fill: black;
