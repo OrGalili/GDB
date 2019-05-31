@@ -57,13 +57,15 @@ public class GDBController implements Initializable {
     @FXML
     public TableView<FrameInfo> Stack;
 
-    private List<FrameInfo> breakpointsFrameList;
-
     @FXML
     public TableView<FrameInfo> Breakpoints;
 
     @FXML
     public Text OutputText;
+
+    @FXML
+    public TextField InputText;
+
 
     public GDBController() throws Exception {
         this.model = new GDBModel();
@@ -211,15 +213,16 @@ public class GDBController implements Initializable {
         }}.start();
     }
 
-
-
     @FXML
     protected void Step(ActionEvent event){
         new Thread() { public void run() {
             disableRunningModeButtons(true);
             model.setInput("next");
+            //open input connection
             OutputText.setText(OutputText.getText()+model.getOutPut());//redundant output
+            //close input connection
             updateUI();
+
         }}.start();
     }
 
@@ -370,8 +373,6 @@ public class GDBController implements Initializable {
     }
 
     private void updateBreakpoints(){
-        if(breakpointsFrameList != null)
-            breakpointsFrameList.clear();
         Breakpoints.getItems().clear();
         model.setInput("info breakpoints");
         String out = model.getOutPut();
@@ -383,8 +384,8 @@ public class GDBController implements Initializable {
                 ((ArrayList<String>) BreakpointsList).remove(0);//titles
                 List<String> x = BreakpointsList.stream().filter(sl-> !sl.startsWith(" ") && !sl.startsWith("\t")).collect(toList());
                 List<String[]> frameLineSpaceSplitted = x.stream().map(bp -> bp.split(" ")).collect(toList());
-                breakpointsFrameList = frameLineSpaceSplitted.stream().map(bp -> new FrameInfo(bp[0],bp[bp.length - 1].split(":")[0],bp[bp.length - 3],bp[bp.length - 1].split(":")[1])).collect(toList());
-                Breakpoints.getItems().addAll(breakpointsFrameList);
+                List<FrameInfo> FrameList = frameLineSpaceSplitted.stream().map(bp -> new FrameInfo(bp[0],bp[bp.length - 1].split(":")[0],bp[bp.length - 3],bp[bp.length - 1].split(":")[1])).collect(toList());
+                Breakpoints.getItems().addAll(FrameList);
             }
             catch(Exception e) {
                 System.out.println(e);
@@ -399,6 +400,4 @@ public class GDBController implements Initializable {
         IOPane.layout();
         IOPane.setVvalue(1);
     }
-
-
 }
