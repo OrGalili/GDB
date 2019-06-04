@@ -9,12 +9,21 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("GDBView.fxml"));
+    public void start(Stage primaryStage) throws Exception {
+       /* Parent root = FXMLLoader.load(getClass().getResource("GDBView.fxml"));
         primaryStage.setTitle("GDB UI");
         primaryStage.setScene(new Scene(root, 560, 700));
         primaryStage.setResizable(false);
+        primaryStage.show();*/
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("GDBView.fxml"));
+        Parent root = loader.load();
+        GDBController controller = loader.getController();
+        primaryStage.setTitle("GDB UI");
+        primaryStage.setScene(new Scene(root, 560, 700));
+        primaryStage.setResizable(false);
+        primaryStage.setOnHidden(e -> controller.shutdown());
         primaryStage.show();
+
     }
 
 
