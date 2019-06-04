@@ -3,18 +3,8 @@
     -fx-faint-focus-color: transparent;
 }
 
-.scroll-pane {
-    -fx-padding: 20;
-    -fx-border-width: 20;
-    -fx-border-radius: 20;
-}
-
 .scroll-pane > .viewport  {
     -fx-background-color: WHITE;
-    /*-fx-padding: 20;*/
-    /*-fx-border-width: 20;*/
-    /*-fx-border-radius: 20;*/
-
 }
 
 .list-cell:filled:selected:focused, .list-cell:filled:selected {
