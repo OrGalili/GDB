@@ -21,10 +21,10 @@ public class GDBModel {
             if (subProcess == null || !subProcess.isAlive())
                 startGDB();
         }
-        catch (IOException e){ }
+        catch (Exception e){ }
     }
 
-    private void startGDB() throws IOException {
+    private void startGDB() throws Exception {
         subProcess = processBuilder.start();
         inpStr = subProcess.getOutputStream();  /* Handle to the stdin of process */
         outStr = subProcess.getInputStream();   /* Handle to the stdout of process*/
@@ -34,7 +34,21 @@ public class GDBModel {
     }
 
     public void stopGDB(){
+        subProcess.destroy();
+    }
 
+    public boolean GDBAlive(){
+        return subProcess.isAlive();
+    }
+
+    public void flushBuffer(){
+        try {
+            bufferedReader.reset();
+            bufferedWriter.flush();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setInput(String in){
@@ -43,16 +57,16 @@ public class GDBModel {
             bufferedWriter.flush();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
-    public String getOutPut() {
+    public String getOutPut() throws Exception {
         int ascii;
         char c;
         String GDBOutput = "";
-        try {
-            Thread.sleep(15);//15
+       // try {
+            Thread.sleep(30);//15
             while (true) {
                 //
                /* inpState = bufferedReader.ready();
@@ -68,9 +82,9 @@ public class GDBModel {
                 if (inpState == false)
                     break;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //} catch (Exception e) {
+        //    e.printStackTrace();
+        //}
         return GDBOutput;
     }
 }
