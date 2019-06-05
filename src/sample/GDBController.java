@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
@@ -64,7 +65,7 @@ public class GDBController implements Initializable {
     public TableView<FrameInfo> Breakpoints;
 
     @FXML
-    public TableView<VariableInfo> Variables;
+    public TreeTableView<VariableInfo> Variables;
 
     @FXML
     public Text OutputText;
@@ -145,19 +146,24 @@ public class GDBController implements Initializable {
         BooleanProperty observable = new SimpleBooleanProperty();
         String lineNumber;
         String fileName;
-        if (Breakpoints.getItems().size() > 0) {
-            lineNumber = item.substring(0, item.indexOf('\t'));
-            fileName = sourceFiles.getSelectionModel().getSelectedItem().getText();
+        try {
+            if (Breakpoints.getItems().size() > 0) {
+                lineNumber = item.substring(0, item.indexOf('\t'));
+                fileName = sourceFiles.getSelectionModel().getSelectedItem().getText();
 
-            if (Breakpoints.getItems().stream().anyMatch(bp -> bp.getLineNumber().equals(lineNumber) && bp.getClassName().equals(fileName))) {
-                observable.set(true);
-            }
-        }
-        observable.addListener((obs, wasSelected, isNowSelected) ->
-                {
-                    onCheckBoxClicked(wasSelected, isNowSelected, item);
+                if (Breakpoints.getItems().stream().anyMatch(bp -> bp.getLineNumber().equals(lineNumber) && bp.getClassName().equals(fileName))) {
+                    observable.set(true);
                 }
-        );
+            }
+            observable.addListener((obs, wasSelected, isNowSelected) ->
+                    {
+                        onCheckBoxClicked(wasSelected, isNowSelected, item);
+                    }
+            );
+        }
+        catch (Exception e){
+
+        }
         return observable;
     }
 
@@ -231,7 +237,7 @@ public class GDBController implements Initializable {
                     sourceFiles.getSelectionModel().selectedItemProperty().addListener(tabItemSelected);
                     Stack.getItems().clear();
                     Breakpoints.getItems().clear();
-                    Variables.getItems().clear();
+//                    Variables.getItems().clear();
                     model.setInput("info sources");
                     Collection<String> linesSources = new ArrayList(Arrays.asList(model.getOutPut().split("\n")));
                     ((ArrayList<String>) linesSources).remove(0);
@@ -562,19 +568,195 @@ public class GDBController implements Initializable {
     }
 
     private void updateVariables() throws Exception {
-        Variables.getItems().clear();
+       /* Variables.getItems().clear();
         model.setInput("info locals");
         String out = model.getOutPut();
         if (!out.equals("No locals.\n(gdb) ") && !out.equals("No frame selected.\n(gdb) ")) {
             try {
                 out = out.substring(0, out.length() - 6);
-                String[] variablesLines = out.split("\n");
-                List<VariableInfo> variableList = Arrays.stream(variablesLines).map(vl -> new VariableInfo(vl.split("=", 2)[0], vl.split("=", 2)[1])).collect(toList());
+                String[] variablesLines = out.split("\"");
+                List<VariableInfo> variableList = Arrays.stream(variablesLines).map(vl -> vl.contains("=")? new VariableInfo(vl.split("=", 2)[0], vl.split("=", 2)[1]):new VariableInfo(vl.split("\\s+", 2)[0], vl.split("\\s+", 2)[1])).collect(toList());
                 Variables.getItems().addAll(variableList);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }*/
+
+
+        model.setInput("info locals");
+        String out = model.getOutPut();
+        if (!out.equals("No locals.\n(gdb) ") && !out.equals("No frame selected.\n(gdb) ")) {
+            try {
+                Stack<Character> sc = new Stack<Character>();
+                out = out.substring(0, out.length() - 6);
+                String[] variablesLines = out.split("\n");
+
+                VariableInfo vi = new VariableInfo();
+                StringBuilder str = new StringBuilder();
+                IntHolder r = new IntHolder(0);
+                IntHolder c = new IntHolder(0);
+                List<VariableInfo> variableInfoList = new ArrayList<>();
+                while (r.value < variablesLines.length) {
+                    recursion(vi, sc, variablesLines, r, c, str);
+                    variableInfoList.add(vi);
+                    vi = new VariableInfo();
+                }
+
+                TreeTableView<VariableInfo> tree = new TreeTableView<>();
+                tree.setColumnResizePolicy(TreeTableView.UNCONSTRAINED_RESIZE_POLICY);
+
+                TreeTableColumn<VariableInfo, String> NameColumn = new TreeTableColumn<>("Name");
+                tree.getColumns().add(NameColumn);
+                NameColumn.setCellValueFactory(param -> param.getValue().getValue().getVairableName());
+                TreeTableColumn<VariableInfo, String> ValueColumn = new TreeTableColumn<>("Value");
+                tree.getColumns().add(ValueColumn);
+                ValueColumn.setCellValueFactory(param -> param.getValue().getValue().getVairableValue());
+
+                VariableInfo NameRoot = new VariableInfo("");
+                VariableInfo ValueRoot = new VariableInfo("");
+
+
+                for (VariableInfo variable : variableInfoList) {
+                    final TreeItem<VariableInfo> rootNameItem = new TreeItem<>(NameRoot);
+                    NameRoot.getChilds().add(variable);
+                    tree.setRoot(rootNameItem);
+                    addTreeItemsRecursive(NameRoot, rootNameItem);
+
+                    ValueRoot.getChilds().add(variable);
+                    final TreeItem<VariableInfo> rootValueItem = new TreeItem<>(ValueRoot);
+                    tree.setRoot(rootValueItem);
+                    addTreeItemsRecursive(ValueRoot, rootValueItem);
+                }
+
+                tree.getRoot().setExpanded(true);
+                NameColumn.setSortable(false);
+                ValueColumn.setSortable(false);
+                tree.getRoot().expandedProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue == false)
+                        tree.getRoot().setExpanded(true);
+                });
+                ToolsPane.getTabs().get(3).setContent(tree);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void addTreeItemsRecursive(VariableInfo task, TreeItem<VariableInfo> item){
+        for (VariableInfo subtask : task.getChilds()) {
+            TreeItem<VariableInfo> subTaskItem = new TreeItem<>(subtask);
+            item.getChildren().add(subTaskItem);
+
+            addTreeItemsRecursive(subtask, subTaskItem);
+        }
+    }
+
+    private VariableInfo recursion(VariableInfo vi,Stack<Character> stackCharacters,String[] sourceLines,IntHolder row, IntHolder col,StringBuilder str) {
+        try {
+
+            char c = ' ';
+            char charBefore = ' ';
+            int childNumber = 0;
+            boolean isPrimitiveType = false;
+
+            for (; row.value < sourceLines.length; row.inc()) {
+                if(col.value >= sourceLines[row.value].length())
+                    col.value = 0;
+                for (; col.value < sourceLines[row.value].length(); col.inc()) {
+                    if (stackCharacters.empty()) {
+                        c = sourceLines[row.value].charAt(col.value);
+                        if (!vi.getIsNameInitialized() && c == '=') {
+                            if(sourceLines[row.value].charAt(col.value+2) !='{')
+                                isPrimitiveType = true;
+                            vi.setVariableName(str.toString().trim());
+                            str.setLength(0);
+                        } else if (c == '{') {
+                            stackCharacters.push('{');
+                            vi.getChilds().add(new VariableInfo());
+                        } else if (c == '}') {
+
+                        } else if (c == '"') {
+                            stackCharacters.push('"');
+                            str.append(c);
+                        } /*else if (c == '\'') {
+                        stackCharacters.push('\'');
+                    }*/ else if (c == ',') {
+
+                        } else// if (c != ' ')
+                            str.append(c);
+                        charBefore = c;
+                    } else {
+                        if (stackCharacters.peek() == '{') {
+                            c = sourceLines[row.value].charAt(col.value);
+                            if (!vi.getChilds().get(childNumber).getIsNameInitialized() && c == '=') {
+                                vi.getChilds().get(childNumber).setVariableName(str.toString().trim());
+                                str.setLength(0);
+                            } else if (c == '{') {
+                                stackCharacters.push('{');
+                                //vi.getChilds().add(new VariableInfo());
+                                vi.getChilds().get(childNumber).getChilds().add(new VariableInfo());
+                                col.inc();//because when starting for loop there is no incrementation
+                                recursion(vi.getChilds().get(childNumber), stackCharacters, sourceLines, row, col, str);
+                                if (stackCharacters.empty()) {
+                                    return vi;
+                                }
+                            } else if (c == '}') {
+                                stackCharacters.pop();
+                                vi.getChilds().get(childNumber).setVariableValue(str.toString().trim());
+                                if(!vi.getChilds().get(childNumber).getIsNameInitialized()){
+                                    vi.getChilds().get(childNumber).setVariableName(Integer.toString(childNumber));
+                                }
+                                str.setLength(0);
+                                childNumber++;
+                                //if (!stackCharacters.empty()) {
+                                    return vi;
+                                //}
+                                //childNumber++;
+                            } else if (c == '"') {
+                                stackCharacters.push('"');
+                                str.append(c);
+                            } /*else if (c == '\'') {
+                            stackCharacters.push('\'');
+                        }*/ else if (c == ',') {
+                                vi.getChilds().get(childNumber).setVariableValue(str.toString().trim());
+//                                childNumber
+                                if(!vi.getChilds().get(childNumber).getIsNameInitialized()){
+                                    vi.getChilds().get(childNumber).setVariableName(Integer.toString(childNumber));
+                                }
+                                str.setLength(0);
+                                vi.getChilds().add(new VariableInfo());
+                                childNumber++;
+                            } else// if (c != ' ')
+                                str.append(c);
+                            charBefore = c;
+                        } else if (stackCharacters.peek() == '"' /*|| stackCharacters.peek() == '\''*/) {
+                            c = sourceLines[row.value].charAt(col.value);
+                            if (/*c == '\'' ||*/ c == '"' && charBefore != '\\') {
+                                stackCharacters.pop();
+                                str.append(c);
+                            } else //if (c != ' ')
+                                str.append(c);
+                            charBefore = c;
+                        }
+                    }
+                }
+                col.value = 0;
+                if(isPrimitiveType)
+                {
+                    row.inc();
+                    vi.setVariableValue(str.toString().trim());
+                    str.setLength(0);
+                    return vi;
+                }
+            }
+
+
+            vi.setVariableValue(str.toString().trim());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return vi;
     }
 
     //Refreshing to bottom

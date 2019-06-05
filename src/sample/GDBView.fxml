@@ -10,7 +10,8 @@
 <?import java.net.URL?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?language javascript?>
-  <GridPane alignment="CENTER" hgap="10.0" prefWidth="259.0" minWidth="400" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.GDBController">
+<?import javafx.scene.control.cell.TreeItemPropertyValueFactory?>
+<GridPane alignment="CENTER" hgap="10.0" prefWidth="259.0" minWidth="400" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.GDBController">
     <GridPane prefHeight="237.0" prefWidth="259.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
       <children>
         <ToolBar>
@@ -102,23 +103,42 @@
               </ScrollPane>
             </Tab>
             <Tab text="Variables">
-              <TableView fx:id="Variables" editable="false" layoutX="0.0" layoutY="0.0" prefHeight="82.00009999999747" prefWidth="259.0">
-                <placeholder>
-                  <Label text=""/>
-                </placeholder>
-                <columns>
-                  <TableColumn text="Name" prefWidth="200">
-                    <cellValueFactory>
-                      <PropertyValueFactory property="vairableName"></PropertyValueFactory>
-                    </cellValueFactory>
-                  </TableColumn>
-                  <TableColumn text="Value" prefWidth="360">
-                    <cellValueFactory>
-                      <PropertyValueFactory property="vairableValue"></PropertyValueFactory>
-                    </cellValueFactory>
-                  </TableColumn>
-                </columns>
-              </TableView>
+<!--                <TreeTableView fx:id="Variables" prefWidth="500">-->
+<!--                    <placeholder>-->
+<!--                        <Label text=""/>-->
+<!--                    </placeholder>-->
+<!--                    <columns>-->
+<!--                        <TreeTableColumn text = "Name">-->
+<!--                            <cellValueFactory>-->
+<!--                                <TreeItemPropertyValueFactory property="variableName">-->
+<!--                                </TreeItemPropertyValueFactory>-->
+<!--&lt;!&ndash;                                <PropertyValueFactory property="variableName"></PropertyValueFactory>&ndash;&gt;-->
+<!--                            </cellValueFactory>-->
+<!--                        </TreeTableColumn>-->
+<!--                        <TreeTableColumn text = "Value">-->
+<!--                            <cellValueFactory>-->
+<!--                                <TreeItemPropertyValueFactory property="variableValue"></TreeItemPropertyValueFactory>-->
+<!--                            </cellValueFactory>-->
+<!--                        </TreeTableColumn>-->
+<!--                    </columns>-->
+<!--                </TreeTableView>-->
+<!--              <TableView fx:id="Variables" editable="false" layoutX="0.0" layoutY="0.0" prefHeight="82.00009999999747" prefWidth="259.0">-->
+<!--                <placeholder>-->
+<!--                  <Label text=""/>-->
+<!--                </placeholder>-->
+<!--                <columns>-->
+<!--                  <TableColumn text="Name" prefWidth="200">-->
+<!--                    <cellValueFactory>-->
+<!--                      <PropertyValueFactory property="vairableName"></PropertyValueFactory>-->
+<!--                    </cellValueFactory>-->
+<!--                  </TableColumn>-->
+<!--                  <TableColumn text="Value" prefWidth="360">-->
+<!--                    <cellValueFactory>-->
+<!--                      <PropertyValueFactory property="vairableValue"></PropertyValueFactory>-->
+<!--                    </cellValueFactory>-->
+<!--                  </TableColumn>-->
+<!--                </columns>-->
+<!--              </TableView>-->
             </Tab>
           </tabs>
         </TabPane>

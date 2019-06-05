@@ -16,10 +16,25 @@
     -fx-background-color: white;
 }
 
+/*.root                             { -fx-font: 18px "Comic Sans MS";    }*/
+
+
+.tree-table-cell {
+    -fx-border-color: black;
+    -fx-border-style: solid;
+}
+
+.tree-table-cell > .text-field {
+    /*-fx-font: 50px "Comic Sans MS";*/
+    -fx-background-color: red;
+
+}
+
 .list-cell:filled:hover {
     /*-fx-background-color: #0093ff;*/
     /*-fx-text-fill: white;*/
 }
+
 
 .check-box > .box{
     /*the color of the in box checkbox*/

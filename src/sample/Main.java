@@ -24,6 +24,7 @@ public class Main extends Application {
         primaryStage.setOnHidden(e -> controller.shutdown());
         primaryStage.show();
 
+
     }
 
 
