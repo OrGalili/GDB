@@ -237,6 +237,7 @@ public class GDBController implements Initializable {
                     sourceFiles.getSelectionModel().selectedItemProperty().addListener(tabItemSelected);
                     Stack.getItems().clear();
                     Breakpoints.getItems().clear();
+                    ToolsPane.getTabs().get(3).setContent(null);
 //                    Variables.getItems().clear();
                     model.setInput("info sources");
                     Collection<String> linesSources = new ArrayList(Arrays.asList(model.getOutPut().split("\n")));
@@ -628,8 +629,12 @@ public class GDBController implements Initializable {
                     addTreeItemsRecursive(ValueRoot, rootValueItem);
                 }
 
+                tree.setPrefWidth(560);
+                tree.setMinWidth(560);
                 tree.getRoot().setExpanded(true);
                 NameColumn.setSortable(false);
+                NameColumn.setMinWidth(280);
+                ValueColumn.setMinWidth(280);
                 ValueColumn.setSortable(false);
                 tree.getRoot().expandedProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue == false)
