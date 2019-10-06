@@ -19,7 +19,7 @@ public class Main extends Application {
         Parent root = loader.load();
         GDBController controller = loader.getController();
         primaryStage.setTitle("GDB UI");
-        primaryStage.setScene(new Scene(root, 560, 700));
+        primaryStage.setScene(new Scene(root, 608, 700));
         primaryStage.setResizable(false);
         primaryStage.setOnHidden(e -> controller.shutdown());
         primaryStage.show();

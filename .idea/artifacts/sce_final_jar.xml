@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="sce-final:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/sce_final_jar</output-path>
+    <root id="archive" name="sce-final.jar">
+      <element id="module-output" name="sce-final" />
+    </root>
+  </artifact>
+</component>

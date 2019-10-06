@@ -331,7 +331,7 @@ public class GDBController implements Initializable {
 
 
     @FXML
-    protected void Step(ActionEvent event) {
+    protected void Step() {
         new Thread() {
             public void run() {
                 try {
