@@ -33,7 +33,7 @@
           <Button fx:id="StopDebugBtn" onAction="#StopDebug" text="stop debug" disable="true"/>
         </ToolBar>
         <TabPane fx:id="sourceFiles" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-        <!--<ListView fx:id="code" prefWidth="200.0" GridPane.rowIndex="2" GridPane.columnIndex="0"  />-->
+        <!--dynamically listview produced from code <ListView fx:id="code" prefWidth="200.0" GridPane.rowIndex="2" GridPane.columnIndex="0"  />-->
         <TabPane fx:id="ToolsPane" prefHeight="300.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="0" GridPane.rowIndex="2">
           <tabs>
             <Tab text="Call Stack">
