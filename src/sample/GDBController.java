@@ -228,9 +228,13 @@ public class GDBController implements Initializable {
             if (file != null) {
                 String exeFilePath = file.getAbsolutePath();
                 System.out.println(exeFilePath);
-                model.setInput("file '" + exeFilePath + "'");
+                String dirPath = exeFilePath.substring(0,exeFilePath.lastIndexOf("\\"));
+                String exeFile = exeFilePath.substring(exeFilePath.lastIndexOf("\\")+1);
+                model.setInput("cd "+dirPath);
+                model.getOutPut();
+                model.setInput("file '" + exeFile + "'");
                 String loadingExeFileMessage = model.getOutPut();
-                if (loadingExeFileMessage.contains("Reading symbols from " + exeFilePath + "...done.")) {
+                if (loadingExeFileMessage.contains("Reading symbols from " + exeFile + "...done.")) {
                     OutputText.setText("");
                     sourceFiles.getSelectionModel().selectedItemProperty().removeListener(tabItemSelected);
                     sourceFiles.getTabs().clear();
@@ -251,7 +255,7 @@ public class GDBController implements Initializable {
                         for (String fp : sourcefilePaths) {
                             if (fp.length() > 1 && !fp.endsWith(".h")) {
                                 Tab tab = new Tab();
-                                String fileName = fp.substring(fp.lastIndexOf("/") + 1);
+                                String fileName = fp.substring(fp.lastIndexOf("\\") + 1);
                                 Tooltip tt = new Tooltip();
                                 tt.setText(fp);
                                 tab.setTooltip(tt);
@@ -265,6 +269,7 @@ public class GDBController implements Initializable {
                                 ListView code = new ListView();
                                 java.util.List<String> lines = Arrays.asList(codeLines);
                                 code.setItems(FXCollections.observableList(lines));
+                                code.setFixedCellSize(30);
                                 code.setCellFactory(CheckBoxListCell.forListView((Callback<String, ObservableValue<Boolean>>) item -> {
                                     return refreshCheckboxCelll(item);
                                 }));
