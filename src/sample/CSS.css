@@ -15,8 +15,11 @@
 
 }
 
-.list-cell,.list-view{
+
+.list-cell{
+    /*color for code lines*/
     -fx-background-color: white;
+
 }
 
 .tool-bar{
