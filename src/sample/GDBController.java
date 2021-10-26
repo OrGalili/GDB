@@ -191,7 +191,7 @@ public class GDBController implements Initializable {
                 //   if(!gdbResponse.startsWith("\n"))
                 //       gdbResponse = "\n"+gdbResponse;
                 String beforeText = OutputText.getText();
-                OutputText.setText(beforeText + gdbResponse);
+                OutputText.setText(beforeText + filterOutPutText(gdbResponse));
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
@@ -211,13 +211,27 @@ public class GDBController implements Initializable {
         // gdbResponse = "\n"+gdbResponse;
         if (gdbResponse.endsWith("\n(gdb) "))
             gdbResponse = gdbResponse.substring(0, gdbResponse.indexOf("(gdb) "));
-        OutputText.setText(OutputText.getText() + gdbResponse);
+        OutputText.setText(OutputText.getText() + filterOutPutText(gdbResponse));
         InputText.setDisable(true);
         InputText.setOnAction(null);
         RunBtn.setDisable(false);
         sourceFiles.setMouseTransparent(false);
         sourceFiles.setFocusTraversable(true);
         openFile.setDisable(false);
+    }
+
+    private String filterOutPutText(String text){
+        //"Starting program: *.exe"
+        String filteredText = text.replaceAll("\\n","");
+        filteredText = filteredText.replaceFirst("Starting program: [a-zA-Z]:\\\\.*","");
+        filteredText = filteredText.replaceAll("\\[New Thread .*]","");
+        filteredText = filteredText.replaceAll("[0-9]+\t.*","");
+        filteredText = filteredText.replaceAll("Thread [1-9]+ hit Breakpoint [1-9]+, .* \\(\\) at .*\\.c:","");
+        filteredText = filteredText.replaceAll(".* at \\.\\\\.*\\.c:","");
+        filteredText = filteredText.replaceAll("Continuing.","");
+        filteredText = filteredText.replaceAll("\\[Thread .* exited with code [0-9]+]","");
+        filteredText = filteredText.replaceAll("\\[Inferior .* \\(process [1-9]+\\) exited .*]","");
+        return filteredText;
     }
 
     @FXML
@@ -475,7 +489,7 @@ public class GDBController implements Initializable {
         String out = model.getOutPut();
         String[] splittedOut = out.split("\n");
         if (splittedOut[2].startsWith("Located in")) {
-            String sourceFilePath = splittedOut[2].substring(splittedOut[2].indexOf('/'));
+            String sourceFilePath = splittedOut[2].substring(splittedOut[2].indexOf('\\'));
             for (Tab sourceFileTab : sourceFiles.getTabs())
                 if (sourceFileTab.getTooltip().getText().equals(sourceFilePath)) {
                     sourceFiles.getSelectionModel().select(sourceFileTab);
@@ -634,12 +648,10 @@ public class GDBController implements Initializable {
                     addTreeItemsRecursive(ValueRoot, rootValueItem);
                 }
 
-                tree.setPrefWidth(560);
-                tree.setMinWidth(560);
                 tree.getRoot().setExpanded(true);
                 NameColumn.setSortable(false);
-                NameColumn.setMinWidth(280);
-                ValueColumn.setMinWidth(280);
+                NameColumn.setMinWidth(703);
+                ValueColumn.setMinWidth(703);
                 ValueColumn.setSortable(false);
                 tree.getRoot().expandedProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue == false)

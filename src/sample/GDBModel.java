@@ -85,6 +85,7 @@ public class GDBModel {
         //} catch (Exception e) {
         //    e.printStackTrace();
         //}
-        return GDBOutput;
+        GDBOutput = GDBOutput.replaceAll("\\r","");
+        return GDBOutput.replaceAll("\\r","");
     }
 }
